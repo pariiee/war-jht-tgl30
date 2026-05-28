@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asisten War Tiket JHT</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --success: #2ed573;
+            --danger: #ff4757;
+            --bg: #f5f7fb;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); width: 100%; max-width: 450px; box-sizing: border-box; }
+        h2 { margin-top: 0; color: #333; text-align: center; }
+        .subtitle { color: #666; text-align: center; font-size: 0.9rem; margin-bottom: 25px; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; background-color: white; }
+        button { width: 100%; padding: 12px; background-color: var(--primary); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: #3b5984; }
+        .hidden { display: none; }
+        #timer { font-size: 2.5rem; font-weight: bold; color: var(--danger); text-align: center; margin: 20px 0; font-variant-numeric: tabular-nums; }
+        .data-list { margin-top: 20px; border-top: 2px dashed #eee; padding-top: 20px; }
+        .data-item { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 15px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
+        .data-text { font-size: 0.95rem; color: #333; word-break: break-all; margin-right: 10px; }
+        .btn-copy { width: auto; padding: 6px 12px; font-size: 0.85rem; background-color: var(--success); }
+        .btn-copy:hover { background-color: #26af5f; }
+        .btn-reset { background-color: #777; margin-top: 15px; }
+        .btn-reset:hover { background-color: #555; }
+        .route-highlight { background-color: #fff3cd; border: 1px solid #ffeeba; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <!-- HALAMAN 1: FORM INPUT DATA -->
+    <div id="pageForm">
+        <h2>Konfigurasi War</h2>
+        <p class="subtitle">Isi data dan pilih rute yang ingin diincar.</p>
+        
+        <div class="form-group">
+            <label for="inputNama">Nama Lengkap (Sesuai KTP)</label>
+            <input type="text" id="inputNama" placeholder="Contoh: Abdullah Azzam" required>
+        </div>
+        <div class="form-group">
+            <label for="inputWA">Nomor WhatsApp</label>
+            <input type="tel" id="inputWA" placeholder="Contoh: 08123456789" required>
+        </div>
+        <div class="form-group">
+            <label for="inputEmail">Alamat Email</label>
+            <input type="email" id="inputEmail" placeholder="Contoh: nama@email.com" required>
+        </div>
+        <div class="form-group">
+            <label for="inputInstansi">Asal Instansi / Sekolah</label>
+            <input type="text" id="inputInstansi" placeholder="Contoh: SMKN 1 Dukuhturi" required>
+        </div>
+        <div class="form-group">
+            <label for="inputRute">Rute & Bus yang Diincar</label>
+            <select id="inputRute" required>
+                <option value="" disabled selected>-- Pilih Rute Target --</option>
+                <option value="Sangkaning Dumadi (12:30) - Bus Kraton">Sangkaning Dumadi (12:30) - Bus Kraton</option>
+                <option value="Sangkaning Dumadi (12:30) - Bus Malioboro">Sangkaning Dumadi (12:30) - Bus Malioboro</option>
+                <option value="Paraning Dumadi (15:30) - Bus Kraton">Paraning Dumadi (15:30) - Bus Kraton</option>
+                <option value="Paraning Dumadi (15:30) - Bus Malioboro">Paraning Dumadi (15:30) - Bus Malioboro</option>
+                <option value="Colonial Heritage (18:30) - Bus Kraton">Colonial Heritage (18:30) - Bus Kraton</option>
+            </select>
+        </div>
+        
+        <button onclick="simpanDanLanjut()">Simpan Data & Buka Timer</button>
+    </div>
+
+    <!-- HALAMAN 2: TIMER & QUICK COPY -->
+    <div id="pageTimer" class="hidden">
+        <h2>Menunggu Waktu War</h2>
+        <p class="subtitle">Target: 29 Mei, Jam 12:00:00 WIB</p>
+        
+        <div id="timer">00j 00m 00d</div>
+
+        <div id="sectionAksi" class="hidden">
+            <div class="data-list">
+                <!-- Pengingat Rute (Diberi warna berbeda agar mencolok) -->
+                <div class="data-item route-highlight">
+                    <span class="data-text"><strong>Target Rute:</strong> <span id="txtRute" style="color: #b7791f; font-weight: bold;"></span></span>
+                    <button class="btn-copy" style="background-color: #e2e8f0; color: #4a5568;" onclick="copyText('txtRute')">Salin</button>
+                </div>
+                <div class="data-item">
+                    <span class="data-text"><strong>Nama:</strong> <span id="txtNama"></span></span>
+                    <button class="btn-copy" onclick="copyText('txtNama')">Salin</button>
+                </div>
+                <div class="data-item">
+                    <span class="data-text"><strong>WA:</strong> <span id="txtWA"></span></span>
+                    <button class="btn-copy" onclick="copyText('txtWA')">Salin</button>
+                </div>
+                <div class="data-item">
+                    <span class="data-text"><strong>Email:</strong> <span id="txtEmail"></span></span>
+                    <button class="btn-copy" onclick="copyText('txtEmail')">Salin</button>
+                </div>
+                <div class="data-item">
+                    <span class="data-text"><strong>Instansi:</strong> <span id="txtInstansi"></span></span>
+                    <button class="btn-copy" onclick="copyText('txtInstansi')">Salin</button>
+                </div>
+            </div>
+            <p style="color: var(--success); font-weight: bold; text-align: center; margin-top: 15px;">Waktu Habis! Silakan buka web JHT dan salin data di atas.</p>
+        </div>
+
+        <button class="btn-reset" onclick="hapusSesi()">Edit Data / Ganti Rute</button>
+    </div>
+</div>
+
+<script>
+    // Tanggal target tetap 29 Mei 2026 jam 12 siang (Bulan Mei = indeks 4 di JS)
+    const targetDate = new Date(2026, 4, 29, 12, 0, 0).getTime();
+    let countdownInterval;
+
+    window.onload = function() {
+        if (localStorage.getItem("jht_nama")) {
+            tampilkanHalamanTimer();
+        }
+    };
+
+    function simpanDanLanjut() {
+        const nama = document.getElementById("inputNama").value;
+        const wa = document.getElementById("inputWA").value;
+        const email = document.getElementById("inputEmail").value;
+        const instansi = document.getElementById("inputInstansi").value;
+        const rute = document.getElementById("inputRute").value;
+
+        if(!nama || !wa || !email || !instansi || !rute) {
+            alert("Harap isi semua data dan pilih rute terlebih dahulu!");
+            return;
+        }
+
+        localStorage.setItem("jht_nama", nama);
+        localStorage.setItem("jht_wa", wa);
+        localStorage.setItem("jht_email", email);
+        localStorage.setItem("jht_instansi", instansi);
+        localStorage.setItem("jht_rute", rute);
+
+        tampilkanHalamanTimer();
+    }
+
+    function tampilkanHalamanTimer() {
+        document.getElementById("pageForm").classList.add("hidden");
+        document.getElementById("pageTimer").classList.remove("hidden");
+
+        document.getElementById("txtNama").innerText = localStorage.getItem("jht_nama");
+        document.getElementById("txtWA").innerText = localStorage.getItem("jht_wa");
+        document.getElementById("txtEmail").innerText = localStorage.getItem("jht_email");
+        document.getElementById("txtInstansi").innerText = localStorage.getItem("jht_instansi");
+        document.getElementById("txtRute").innerText = localStorage.getItem("jht_rute");
+
+        jalankanTimer();
+    }
+
+    function jalankanTimer() {
+        if(countdownInterval) clearInterval(countdownInterval);
+
+        countdownInterval = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                document.getElementById("timer").innerHTML = "MULAI WAR!";
+                document.getElementById("timer").style.color = "var(--success)";
+                document.getElementById("sectionAksi").classList.remove("hidden");
+                return;
+            }
+
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const formatSatuDigit = (num) => num < 10 ? "0" + num : num;
+
+            document.getElementById("timer").innerHTML = 
+                formatSatuDigit(hours) + "j " + formatSatuDigit(minutes) + "m " + formatSatuDigit(seconds) + "d";
+        }, 1000);
+    }
+
+    function copyText(elementId) {
+        const textToCopy = document.getElementById(elementId).innerText;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            // Notifikasi popup kecil
+            alert("Berhasil disalin: " + textToCopy);
+        }).catch(err => {
+            console.error('Gagal menyalin: ', err);
+        });
+    }
+
+    function hapusSesi() {
+        if(confirm("Apakah kamu ingin mengubah data atau rute target?")) {
+            clearInterval(countdownInterval);
+            localStorage.clear();
+            document.getElementById("pageTimer").classList.add("hidden");
+            document.getElementById("sectionAksi").classList.add("hidden");
+            document.getElementById("timer").style.color = "var(--danger)";
+            document.getElementById("pageForm").classList.remove("hidden");
+        }
+    }
+</script>
+
+</body>
+</html>
