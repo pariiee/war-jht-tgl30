@@ -76,12 +76,11 @@
     <!-- HALAMAN 2: TIMER & QUICK COPY -->
     <div id="pageTimer" class="hidden">
         <h2>Menunggu Waktu War</h2>
-        <p class="subtitle">Target: 29 Mei, Jam 12:00:00 WIB</p>
+        <p class="subtitle">Target: 30 Mei, Jam 12:00:00 WIB</p>
         
         <div id="timer">00j 00m 00d</div>
 
         <div id="sectionAksi" class="hidden">
-            <!-- Tombol Sihir Baru untuk HP -->
             <button class="btn-copy-all" onclick="copyAllDataCombo()">⚡ SALIN SEMUA DATA SEKALIGUS</button>
 
             <div class="data-list">
@@ -114,7 +113,8 @@
 </div>
 
 <script>
-    const targetDate = new Date(2026, 4, 29, 12, 0, 0).getTime();
+    // TANGGAL TARGET DIUBAH KE: 30 Mei 2026 jam 12:00 siang (Bulan Mei = indeks 4 di JavaScript)
+    const targetDate = new Date(2026, 4, 30, 12, 0, 0).getTime();
     let countdownInterval;
 
     window.onload = function() {
@@ -192,14 +192,12 @@
         });
     }
 
-    // FUNGSI BARU: Menggabungkan data dengan jeda "Tab"
     function copyAllDataCombo() {
         const nama = localStorage.getItem("jht_nama");
         const wa = localStorage.getItem("jht_wa");
         const email = localStorage.getItem("jht_email");
         const instansi = localStorage.getItem("jht_instansi");
         
-        // Karakter \t adalah simbol tombol "Tab" di keyboard
         const gabunganData = nama + "\t" + wa + "\t" + email + "\t" + instansi;
         
         navigator.clipboard.writeText(gabunganData).then(() => {
