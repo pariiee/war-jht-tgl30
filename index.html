@@ -27,6 +27,8 @@
         .data-text { font-size: 0.95rem; color: #333; word-break: break-all; margin-right: 10px; }
         .btn-copy { width: auto; padding: 6px 12px; font-size: 0.85rem; background-color: var(--success); }
         .btn-copy:hover { background-color: #26af5f; }
+        .btn-copy-all { background-color: #ff9f43; margin-bottom: 15px; color: white; }
+        .btn-copy-all:hover { background-color: #ee5253; }
         .btn-reset { background-color: #777; margin-top: 15px; }
         .btn-reset:hover { background-color: #555; }
         .route-highlight { background-color: #fff3cd; border: 1px solid #ffeeba; }
@@ -79,8 +81,10 @@
         <div id="timer">00j 00m 00d</div>
 
         <div id="sectionAksi" class="hidden">
+            <!-- Tombol Sihir Baru untuk HP -->
+            <button class="btn-copy-all" onclick="copyAllDataCombo()">⚡ SALIN SEMUA DATA SEKALIGUS</button>
+
             <div class="data-list">
-                <!-- Pengingat Rute (Diberi warna berbeda agar mencolok) -->
                 <div class="data-item route-highlight">
                     <span class="data-text"><strong>Target Rute:</strong> <span id="txtRute" style="color: #b7791f; font-weight: bold;"></span></span>
                     <button class="btn-copy" style="background-color: #e2e8f0; color: #4a5568;" onclick="copyText('txtRute')">Salin</button>
@@ -102,7 +106,7 @@
                     <button class="btn-copy" onclick="copyText('txtInstansi')">Salin</button>
                 </div>
             </div>
-            <p style="color: var(--success); font-weight: bold; text-align: center; margin-top: 15px;">Waktu Habis! Silakan buka web JHT dan salin data di atas.</p>
+            <p style="color: var(--success); font-weight: bold; text-align: center; margin-top: 15px;">Waktu Habis! Silakan gunakan tombol di atas.</p>
         </div>
 
         <button class="btn-reset" onclick="hapusSesi()">Edit Data / Ganti Rute</button>
@@ -110,7 +114,6 @@
 </div>
 
 <script>
-    // Tanggal target tetap 29 Mei 2026 jam 12 siang (Bulan Mei = indeks 4 di JS)
     const targetDate = new Date(2026, 4, 29, 12, 0, 0).getTime();
     let countdownInterval;
 
@@ -183,10 +186,26 @@
     function copyText(elementId) {
         const textToCopy = document.getElementById(elementId).innerText;
         navigator.clipboard.writeText(textToCopy).then(() => {
-            // Notifikasi popup kecil
-            alert("Berhasil disalin: " + textToCopy);
+            alert("Disalin: " + textToCopy);
         }).catch(err => {
             console.error('Gagal menyalin: ', err);
+        });
+    }
+
+    // FUNGSI BARU: Menggabungkan data dengan jeda "Tab"
+    function copyAllDataCombo() {
+        const nama = localStorage.getItem("jht_nama");
+        const wa = localStorage.getItem("jht_wa");
+        const email = localStorage.getItem("jht_email");
+        const instansi = localStorage.getItem("jht_instansi");
+        
+        // Karakter \t adalah simbol tombol "Tab" di keyboard
+        const gabunganData = nama + "\t" + wa + "\t" + email + "\t" + instansi;
+        
+        navigator.clipboard.writeText(gabunganData).then(() => {
+            alert("SEMUA DATA DI-COPY!\n\nCara pakai di web JHT:\n1. Klik kolom NAMA\n2. Klik TEMPEL / PASTE\n3. Kolom lain akan otomatis terisi secara berurutan.");
+        }).catch(err => {
+            alert("Gagal menyalin otomatis.");
         });
     }
 
